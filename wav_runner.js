@@ -1,15 +1,15 @@
-navigator.getUserMedia = (navigator.getUserMedia ||
-                          navigator.webkitGetUserMedia ||
-                          navigator.mozGetUserMedia ||
-                          navigator.msGetUserMedia);
+
 //Audio Context
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-var source, wav;
+var audio_file = document.querySelector('audio');
+var source = audioCtx.createMediaElementSource(audio_file)
+
 //Analyzer context
 var analyser = audioCtx.createAnalyser();
 analyser.minDecibels = -90;
 analyser.maxDecibels = -10;
 analyser.smoothingTimeConstant = 0.85;
+
 //Canvas context
 var canvas = document.querySelector('#scope');
 var canvasCtx = canvas.getContext("2d");
@@ -18,19 +18,9 @@ var drawVisual;
 canvas.setAttribute('width',intendedWidth);
 
 //main block for RECORDING INPUT SIGNAL
-if (navigator.getUserMedia) {
-   console.log('getUserMedia supported.');
-   navigator.getUserMedia ({audio: true},
-      function(wav) {
-         source = AudioContext.createMediaElementSource(wav);
-         source.connect(analyser);
-         //analyser.connect(distortion);
-         //gainNode.connect(audioCtx.destination);
-      	 draw();
-      },
-      function(err) {console.log('The following gUM error occured: ' + err);}
-   );
-} else {console.log('getUserMedia not supported on your browser!');}
+ source.connect(analyser);
+ analyser.connect(audioCtx.destination);
+ draw();
 
 //general purpose draw() function
 function draw() {
